@@ -94,7 +94,8 @@ Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
 TinyGPSPlus gps;
 // The serial connection to the GPS device
 //SoftwareSerial ss(RXPin, TXPin);
-
+float gpsLAT=0.000000;
+float gpsLONG=0.000000;
 
 //Pins:
 const int GPSOn = 7;
@@ -386,6 +387,10 @@ void startGPS(){
 
                 }
         }
+        gpsLAT = gps.location.lat(),6;
+        gpsLONG = gps.location.lng(),6;
+        Serial.print("GPS is valid: ");
+        Serial.println(gps.location.isValid());
         LED(0, 0, 0);
         for (int i=0; i<10; i++) {
                 LED  (0, 255, 0);// green
@@ -397,10 +402,10 @@ void startGPS(){
         digitalWrite(GPSOn, LOW);
         digitalWrite(lineDrvOn, HIGH);
         int gotGPS=(gps.location.lat(),6);
-        Serial.print(gotGPS);
+
         if (gotGPS ==0) {
                 wdt_enable( WDTO_15MS);
-                delay(500);
+                while(true) ;
         }
 
 
@@ -451,9 +456,9 @@ void Starting()
                 dataFile.print(F("Link to logger position: "));
                 dataFile.print(';');
                 dataFile.print(F("https://www.google.no/maps/search/"));
-                dataFile.print(gps.location.lat(),6);
+                dataFile.print(gpsLAT);
                 dataFile.print('+');
-                dataFile.println(gps.location.lng(),6);
+                dataFile.println(gpsLONG);
                 dataFile.println();
 
 
