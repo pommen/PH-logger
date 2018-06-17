@@ -178,18 +178,6 @@ float sortPH(int samples) //this function sorts samples and avreges them
 }
 //*********************************************************************************************************
 
-
-
-
-
-
-
-
-
-
-
-
-
 void EZOStatus() //asking EZO vcc and reason for last restart.
 {
 
@@ -242,31 +230,21 @@ U unknown
 */
 }
 
+void PHSleep()
+{
 
-void PHSleep(){
-
-      Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
-      Wire.write("sleep");               //transmit the command to sleep.
-      Wire.endTransmission();            //end the I2C data transmission.
-      delay(50);
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    Wire.write("sleep");               //transmit the command to sleep.
+    Wire.endTransmission();            //end the I2C data transmission.
+    delay(50);
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
 int PHLED(int on)
 {
     int state = on;
-   /*  if (state != 1 || state != 0)
+    /*  if (state != 1 || state != 0)
     {
         oled.clear();
             oled.print("no led cmd");

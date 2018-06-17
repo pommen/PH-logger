@@ -27,36 +27,39 @@ Serial.print("Some debug stuff follows");
 #include "SdFat.h"
 #include <U8x8lib.h>
 #include <TinyGPS++.h>
-#include "FreeStack.h"
-
-
-
+//#include "FreeStack.h"
 
 //Objects:
 File dataFile;
-SdFat SD;
+SdFat SD(1);
+SdFat sd2(2);
+// SdFatEX sd2(2);
 RTClock rt(RTCSEL_LSE);
 TinyGPSPlus gps;
 U8X8_SSD1306_128X32_UNIVISION_HW_I2C oled(/* reset=*/U8X8_PIN_NONE, /* clock=*/PB6, /* data=*/PB7);
+time_t tt1;
 
 //Pins:
-const int SD_CS_PIN = PA4; //CS till SD kort
+const uint8_t SD2_CS = PB12;   // chip select for sd2
+const uint8_t SD_CS_PIN = PA4; //CS till SD kort
 const int GPSPower = PB1;
-const int PHPower = PA9;
+const int PHPower = PA10;
+const int loggingTypePin = PA9; //connected to a flipswitch that idecates what kind of logging we want.
 //Globals:
-long int alarmDelay = 3; //this number +1 sec is the sleep time
-boolean bootUpDone = 0;
+long int alarmDelay = 10; //this number +1 sec is the sleep time
+uint32_t CurrentTime = 0;
+char weekday1[][7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}; // 0,1,2,3,4,5,6
 //*******************************************************************************************************
 //#define debugMSG 1 //uncomment this to get deMSG to OLED. Spammy and uses more space
 //*******************************************************************************************************
-String dataString = "";
-uint32_t CurrentTime = 0;
-//char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-//#define I2C_ADDRESS 0x3C //oled I"2 address
 
-double gpsLAT = 0.000000;
-double gpsLONG = 0.000000;
-char fileName[] = "Logger1.csv";
+String dataString;
+String fileName;
+uint8_t loggingType = 0; //0=logging 1=SpotChecking
+long int gpsLAT;
+long int gpsLONG;
+
+boolean bootUpDone = 0;
 int PHaddress = 99;
 
 //protos:
@@ -64,16 +67,18 @@ static void smartDelay(unsigned long ms); //parse GPS while waiting
 //void gpsTest();                           //OLD test rutine
 void startGPS(); //boot GPS up and get fix
 //void displayInfo();                       //OLD GPS rutine
-void SDBoilerPlate();       //Print the boiler plate to SD card. when starting a new log
-void reInitOled();          //Powerup OLED disp after sleepmode
-void initSD();              //Init SD
-void sleep();               //Powersave mode
-void EZOStatus();           //asking EZO vcc and reason for last restart.
-void bootUp();              //check that things are booted up and functioning.
-void syncGPS();             //sync to gps time
-void systemHardReset(void); //reset MCU
-int PHLED(int on);          //toggle the LED on or off the EZO sensor board
-void PHSleep();             //Sets the EZO in sleepmode. send i2c to wake up
+void SDBoilerPlate();           //Print the boiler plate to SD card. when starting a new log
+void reInitOled();              //Powerup OLED disp after sleepmode
+void initSD();                  //Init SD
+void sleep();                   //Powersave mode
+void EZOStatus();               //asking EZO vcc and reason for last restart.
+void bootUp();                  //check that things are booted up and functioning.
+void syncGPS();                 //sync to gps time
+void systemHardReset(void);     //reset MCU
+int PHLED(int on);              //toggle the LED on or off the EZO sensor board
+void PHSleep();                 //Sets the EZO in sleepmode. send i2c to wake up
+void LoggingtypeAndFileNames(); //Here we find ou what kind of logging we should do and generate filenames for them.
+
 //My files:
 
 #include <PH.h>     //Atlas PH stuff
@@ -90,6 +95,7 @@ void setup()
       pinMode(LED_BUILTIN, OUTPUT);
       pinMode(GPSPower, OUTPUT);
       pinMode(PHPower, OUTPUT);
+      pinMode(loggingTypePin, INPUT);
       digitalWrite(GPSPower, LOW);
       digitalWrite(PHPower, LOW);
 
@@ -101,6 +107,7 @@ void setup()
       oled.setPowerSave(0);
       // oled.setFont(u8x8_font_chroma48medium8_r);
       oled.setFont(u8x8_font_amstrad_cpc_extended_f);
+      oled.setFlipMode(1);
       oled.drawUTF8(0, 0, "Starting");
       // oled.println("Starting");
 
@@ -117,12 +124,15 @@ void setup()
       if (bootUpDone == 1)
             SDBoilerPlate();
       delay(200);
+
+      digitalWrite(GPSPower, LOW); //this should be the last ting we do in setup
 }
 void bootUp()
 {
       initSD();
       startGPS();
       syncGPS();
+      LoggingtypeAndFileNames();
 #ifdef debugMSG
       int temp = 1;
       temp = PHLED(temp);
@@ -131,9 +141,7 @@ void bootUp()
 
       temp = PHLED(temp);
 #endif
-      oled.print("LED state: ");
-      oled.print(temp);
-      delay(2000);
+    
       EZOStatus();
       bootUpDone = 1;
 }
@@ -146,8 +154,91 @@ void loop()
       delay(500);
       oled.clear();
 
-     //go back to sleep
+      //go back to sleep
       sleep();
+}
+
+void LoggingtypeAndFileNames()
+{
+      loggingType = digitalRead(loggingTypePin);
+
+      if (loggingType == 1) //Sportchecks are chosen
+      {
+            fileName = "Spotcheck.csv";    //this will be the filename
+            if (!sd2.chdir("/Spotchecks")) //go into the correct folder
+            {
+                  oled.print("Dir2-1");
+                  delay(500);
+                  systemHardReset();
+            }
+            if (!SD.chdir("/Spotchecks"))
+            { //on both SD cards
+                  oled.print("Dir2-1");
+                  delay(500);
+                  systemHardReset();
+            }
+      }
+      if (loggingType == 0)
+      {
+            dataString = (rt.year() + 1970);
+
+            if (rt.month() < 10)
+            {
+                  String temp = "0";
+                  temp += rt.month();
+                  dataString += temp;
+            }
+            else
+                  dataString += rt.month();
+
+            if (rt.day() < 10)
+            {
+                  String temp = "0";
+                  temp += rt.day();
+                  dataString += temp;
+            }
+            else
+                  dataString += (rt.day());
+
+            //  dataString += ('.');
+            // dataString += ('.');
+            dataString += ('-');
+            if (rt.hour() < 10)
+            {
+                  String temp = "0";
+                  temp += rt.hour();
+                  dataString += temp;
+            }
+            else
+                  dataString += (rt.hour());
+            if (rt.minute() < 10)
+            {
+                  String temp = "0";
+                  temp += rt.minute();
+                  dataString += temp;
+            }
+            else
+                  dataString += (rt.minute());
+            dataString += ".csv";
+
+            fileName = dataString;
+            oled.clear();
+            oled.print(fileName);
+            delay(1000);
+
+            if (!sd2.chdir("/Logging")) //go into the correct folder
+            {
+                  oled.print("Dir2-1");
+                  delay(500);
+                  systemHardReset();
+            }
+            if (!SD.chdir("/Logging"))
+            { //on both SD cards
+                  oled.print("Dir2-1");
+                  delay(500);
+                  systemHardReset();
+            }
+      }
 }
 
 void reInitOled()

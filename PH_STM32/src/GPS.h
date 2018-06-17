@@ -39,9 +39,6 @@ December - 31 days
 */
 }
 
-
-
-
 void startGPS()
 {
       digitalWrite(GPSPower, HIGH);
@@ -74,13 +71,22 @@ void startGPS()
                   }
             }
       }
-      gpsLAT = (gps.location.lat(), 6);
-      gpsLONG = (gps.location.lng(), 6);
+      gpsLAT = gps.location.lat()*1000000;
+      gpsLONG = gps.location.lng()*1000000;
+  /*     oled.clear();
+      oled.println(gpsLAT);
+      oled.println(gpsLONG);
 
-     // oled.print("GPS is valid: ");
+      delay(50000); */
+      if (gpsLAT < 1.000000)
+            systemHardReset();
+      if (gpsLONG < 1.000000)
+            systemHardReset();
+
+      // oled.print("GPS is valid: ");
       // oled.println(gps.location.isValid());
-      digitalWrite(GPSPower, LOW);
 }
+
 static void smartDelay(unsigned long ms)
 {
       unsigned long start = millis();
