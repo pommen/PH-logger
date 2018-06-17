@@ -27,7 +27,7 @@ float phMeasure() //polls the atlas sensor for PH and takes avrages. Retuns ph (
     delay(PH_wait_time);
 
     Wire.requestFrom(PHaddress, 4); //call the circuit and request 15 bytes (this may be more than we need)
-    code = Wire.read();              //the first byte is the response code, we read this separately.
+    code = Wire.read();             //the first byte is the response code, we read this separately.
 
     switch (code)
     {
@@ -39,36 +39,33 @@ float phMeasure() //polls the atlas sensor for PH and takes avrages. Retuns ph (
         break; //exits the switch case.
 
     case 2:
-        if (debugMSG == 1) //if debug is enabled
-        {
+#ifdef debugMSG
 
-            oled.clear();
-            oled.drawString(0, 0, "EZO Fail ");
-            delay(2000);
-        } //decimal 2.
+        oled.clear();
+        oled.drawString(0, 0, "EZO Fail ");
+        delay(2000);
+#endif
         return 102;
         break; //exits the switch case.
 
-    case 254:              //decimal 254.
-        if (debugMSG == 1) //if debug is enabled
-        {
+    case 254: //decimal 254.
+#ifdef debugMSG
 
-            oled.clear();
-            oled.drawString(0, 0, "Pending "); //means the command has not yet been finished calculating.
-            delay(2000);
-        }
+        oled.clear();
+        oled.drawString(0, 0, "Pending "); //means the command has not yet been finished calculating.
+        delay(2000);
+#endif
         return 254;
         break; //exits the switch case.
 
     case 255: //decimal 255.
 
-        if (debugMSG == 1) //if debug is enabled
-        {
+#ifdef debugMSG
 
-            oled.clear();
-            oled.drawString(0, 0, "No Data "); //means there is no further data to send.
-            delay(2000);
-        }
+        oled.clear();
+        oled.drawString(0, 0, "No Data "); //means there is no further data to send.
+        delay(2000);
+#endif
         return 255;
         break; //exits the switch case.
     }
@@ -87,16 +84,17 @@ float phMeasure() //polls the atlas sensor for PH and takes avrages. Retuns ph (
         }
     }
     ph_float = atof(ph_data);
-    if (debugMSG == 1)
-    {
+#ifdef debugMSG
 
-        oled.clear();
-        oled.println("sizeof ph_Data: ");
-        oled.println(sizeof(ph_data));
-        oled.println("sizeof ph_float: ");
-        oled.println(sizeof(ph_float));
-        delay(5000);
-    }
+    oled.clear();
+    oled.println("sizeof ph_Data: ");
+    oled.println(sizeof(ph_data));
+    oled.println("sizeof ph_float: ");
+    oled.println(sizeof(ph_float));
+    oled.println("PH: ");
+    oled.println(ph_float);
+    delay(1000);
+#endif
     //oled.println(ph_float);
 
     return ph_float;
@@ -111,28 +109,25 @@ float sortPH(int samples) //this function sorts samples and avreges them
         return 0;
     }
 
-    if (debugMSG == 1) //if debug is enabled
-    {
+#ifdef debugMSG
 
-        oled.clear();
-        //oled.setInverseFont(1);
-        oled.drawUTF8(0, 0, "Getting PH");
-    }
-
+    oled.clear();
+    //oled.setInverseFont(1);
+    oled.drawUTF8(0, 0, "Getting PH");
+#endif
     float buf[20] = {};
     for (size_t i = 0; i < samples; i++) //get (int samples) from the atles EZO and store them in buf[]
     {
         buf[i] = phMeasure();
 
-        if (debugMSG == 1) //if debug is enabled
-        {
+#ifdef debugMSG
 
-            /* code */
-            oled.setCursor(2, 2);
-            oled.print(phMeasure());
-            oled.setCursor(2, 3);
-            oled.print(i);
-        }
+        /* code */
+        oled.setCursor(2, 2);
+        oled.print(phMeasure());
+        oled.setCursor(2, 3);
+        oled.print(i);
+#endif
     }
 
     for (int i = 0; i < samples; i++) //sort the analog from small to large
@@ -157,32 +152,155 @@ float sortPH(int samples) //this function sorts samples and avreges them
     for (int i = onethird; i < onethird * 2; i++) //take the average value of the center samples
     {
         avgValue += buf[i];
-        if (debugMSG == 1) //if debug is enabled
-        {
+#ifdef debugMSG
 
-            oled.clear();
-            oled.setCursor(2, 2);
-            oled.drawString(0, 0, "avgValue: ");
+        oled.clear();
+        oled.setCursor(2, 2);
+        oled.drawString(0, 0, "avgValue: ");
 
-            oled.print(avgValue);
-            oled.setCursor(2, 3);
-            oled.print(i);
-        }
+        oled.print(avgValue);
+        oled.setCursor(2, 3);
+        oled.print(i);
+#endif
     }
     ph_float = avgValue / onethird;
-    if (debugMSG == 1) //if debug is enabled
-    {
+#ifdef debugMSG
 
-        /* code */
-        oled.drawString(0, 0, "avgValue: ");
-        oled.print(avgValue);
-        oled.drawString(0, 1, "onethird: ");
-        oled.print(onethird);
-        oled.drawString(0, 2, "ph_float: ");
-        oled.print(ph_float);
-        delay(2000);
-    }
+    oled.drawString(0, 0, "avgValue: ");
+    oled.print(avgValue);
+    oled.drawString(0, 1, "onethird: ");
+    oled.print(onethird);
+    oled.drawString(0, 2, "ph_float: ");
+    oled.print(ph_float);
+    delay(2000);
+#endif
     return ph_float;
+}
+//*********************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+void EZOStatus() //asking EZO vcc and reason for last restart.
+{
+
+#ifdef debugMSG
+
+    oled.clear();
+    oled.println("ez0status: ");
+    //delay(500);
+#endif
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    Wire.write("Status");              //transmit the command to sleep.
+    Wire.endTransmission();            //end the I2C data transmission.
+
+    delay(300);
+    Wire.requestFrom(PHaddress, 15); //call the circuit and request 20 bytes (this may be more than we need)
+    byte code = Wire.read();         //the first byte is the response code, we read this separately.
+    char EZOStatus[12] = {};
+    int j = 0;
+    while (Wire.available())
+    {
+        //are there bytes to receive.
+        in_char = Wire.read();  //receive a byte.
+        EZOStatus[j] = in_char; //load this byte into our array.
+        j++;                    //incur the counter for the array element.
+        if (in_char == 0)
+        {                           //if we see that we have been sent a null command.
+            j = 0;                  //reset the counter i to 0.
+            Wire.endTransmission(); //end the I2C data transmission.
+            break;                  //exit the while loop.
+        }
+    }
+
+#ifdef debugMSG
+
+    /* code */
+    String temp = EZOStatus;
+    oled.println(temp);
+    oled.print(sizeof(temp));
+    delay(500);
+#endif
+    /*
+Restart codes
+ 
+P powered off
+S software reset
+B brown out
+W watchdog
+U unknown
+
+*/
+}
+
+
+void PHSleep(){
+
+      Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+      Wire.write("sleep");               //transmit the command to sleep.
+      Wire.endTransmission();            //end the I2C data transmission.
+      delay(50);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+int PHLED(int on)
+{
+    int state = on;
+   /*  if (state != 1 || state != 0)
+    {
+        oled.clear();
+            oled.print("no led cmd");
+        while (1)
+        {
+        }
+    } */
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    if (state == 1)
+        Wire.write("L,1"); //Set LED on EZO to "ON"
+    if (state == 0)
+        Wire.write("L,0");  //Set LED on EZO to "ON"
+    Wire.endTransmission(); //end the I2C data transmission.
+
+    delay(1800);
+    Wire.requestFrom(PHaddress, 5); //call the circuit and request 20 bytes (this may be more than we need)
+    //byte code = Wire.read();        //the first byte is the response code, we read this separately.
+    char LEDstatus[3] = {};
+    int j = 0;
+    while (Wire.available())
+    {
+        //are there bytes to receive.
+        in_char = Wire.read();  //receive a byte.
+        LEDstatus[j] = in_char; //load this byte into our array.
+        j++;                    //incur the counter for the array element.
+        if (in_char == 0)
+        {                           //if we see that we have been sent a null command.
+            j = 0;                  //reset the counter i to 0.
+            Wire.endTransmission(); //end the I2C data transmission.
+            break;                  //exit the while loop.
+        }
+    }
+    int response = atoi(LEDstatus);
+    return response;
 }
 
 /*from atlas 
