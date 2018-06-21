@@ -22,11 +22,10 @@ void SDBoilerPlate()
         dataFile.print(rt.month());
         dataFile.print('/');
         dataFile.print(rt.day());
-        dataFile.print(F(" ("));
-        dataFile.print(weekday1[rt.weekday()]);
-        dataFile.print(F(") "));
+        dataFile.print(';');
+
         dataFile.print(rt.hour());
-        dataFile.print(':');
+        dataFile.print(F(':'));
         dataFile.print(rt.minute());
         dataFile.print(';');
         dataFile.print(';');
@@ -68,22 +67,19 @@ void SDBoilerPlate()
         dataFile.print(F("Month"));
         dataFile.print('/');
         dataFile.print(F("Day"));
-        dataFile.print('(');
-        dataFile.print(F("Weekday"));
-        dataFile.print(')');
-        dataFile.print(F("Hour:Minute"));
         dataFile.print(';');
-        dataFile.print(F("PH"));
+        dataFile.print(F("Hour:Minute"));
         dataFile.print(';');
         dataFile.print(F("Vann Temp"));
         dataFile.print(';');
         dataFile.print(F("Luft Temp"));
         dataFile.print(';');
-        dataFile.print("Batt Volt");
+        dataFile.print(F("PH"));
         dataFile.print(';');
-        dataFile.println("freeMemory()");
+        dataFile.println("Batt Volt");
+
         dataFile.close();
-        delay(2000);
+        delay(800);
     }
     else
     {
@@ -109,11 +105,10 @@ void SDBoilerPlate()
         dataFile.print(rt.month());
         dataFile.print('/');
         dataFile.print(rt.day());
-        dataFile.print(F(" ("));
-        dataFile.print(weekday1[rt.weekday()]);
-        dataFile.print(F(") "));
+        dataFile.print(';');
+
         dataFile.print(rt.hour());
-        dataFile.print(':');
+        dataFile.print(F(':'));
         dataFile.print(rt.minute());
         dataFile.print(';');
         dataFile.print(';');
@@ -155,22 +150,19 @@ void SDBoilerPlate()
         dataFile.print(F("Month"));
         dataFile.print('/');
         dataFile.print(F("Day"));
-        dataFile.print('(');
-        dataFile.print(F("Weekday"));
-        dataFile.print(')');
-        dataFile.print(F("Hour:Minute"));
         dataFile.print(';');
-        dataFile.print(F("PH"));
+        dataFile.print(F("Hour:Minute"));
         dataFile.print(';');
         dataFile.print(F("Vann Temp"));
         dataFile.print(';');
         dataFile.print(F("Luft Temp"));
         dataFile.print(';');
-        dataFile.print("Batt Volt");
+        dataFile.print(F("PH"));
         dataFile.print(';');
-        dataFile.println("freeMemory()");
+        dataFile.println("Batt Volt");
+
         dataFile.close();
-        delay(1000);
+        delay(800);
     }
     else
     {
@@ -185,6 +177,8 @@ void SDBoilerPlate()
         }
     }
 }
+
+
 void initSD() //Init SD
 {
     if (!SD.begin(SD_CS_PIN, SPI_HALF_SPEED /*SPI_FULL_SPEED*/))
@@ -202,13 +196,13 @@ void initSD() //Init SD
     {
         oled.clear();
         oled.println(F("  FAIL!!"));
-        oled.println(F("Card2 failed"));
+        oled.println(F("Backup failed"));
         oled.println(F("or not present"));
         delay(1000); // don't do anything more:
         systemHardReset();
         return;
     }
-    oled.println(F("card2 Init."));
+    oled.println(F("backup Init."));
 
     // Serial.print(F("card initialized."));
 
@@ -226,13 +220,13 @@ void initSD() //Init SD
     cardSize = sd2.card()->cardSize();
     if (cardSize == 0)
     {
-        oled.println("cardSize2 failed");
+        oled.println("backup failed");
         delay(500);
         systemHardReset();
 
         return;
     }
-    oled.println("card2 init");
+    oled.println("backup init");
 
     if (!sd2.exists("/Spotchecks"))
     {
@@ -272,3 +266,117 @@ void initSD() //Init SD
         }
     }
 }
+
+//month;date;hour;minute;airTemp;waterTemp;PH;batteryVolts
+void writeToFile(float airTemp, float waterTemp, float ph, float Volt)
+{
+
+    String SDCard[] = {"SD", "sd2"};
+
+    for (size_t i = 0; i < 2; i++)
+    {
+
+        if (i == 0)
+        {
+            dataFile = SD.open(fileName, FILE_WRITE);
+            /* code */
+        }
+        else
+            dataFile = sd2.open(fileName, FILE_WRITE);
+
+        // if the file is available, write to it:
+        if (dataFile)
+        {
+
+            dataFile.seek(dataFile.size());
+
+            //Boilderplate for .CSV file
+            if (rt.month() < 10)
+            {
+                String temp = "0";
+                temp += rt.month();
+                dataFile.print(temp);
+            }
+            else
+                dataFile.print(rt.month());
+
+            dataFile.print(F("/"));
+
+            if (rt.day() < 10)
+            {
+                String temp = "0";
+                temp += rt.day();
+                dataString += temp;
+                dataFile.print(temp);
+            }
+            else
+                dataFile.print(rt.day());
+
+            dataFile.print(F(";"));
+
+            if (rt.hour() < 10)
+            {
+                String temp = "0";
+                temp += rt.hour();
+                dataString += temp;
+                dataFile.print(temp);
+            }
+            else
+                dataFile.print(rt.hour());
+
+            dataFile.print(F(":"));
+            if (rt.minute() < 10)
+
+            {
+                String temp = "0";
+                temp += rt.minute();
+                dataString += temp;
+                dataFile.print(temp);
+            }
+            else
+                dataFile.print(rt.minute());
+
+            dataFile.print(F(";"));
+            dataFile.print(waterTemp);
+            dataFile.print(F(";"));
+            dataFile.print(airTemp);
+            dataFile.print(F(";"));
+            dataFile.print(ph);
+            dataFile.print(F(";"));
+            dataFile.println(Volt);
+
+            dataFile.close();
+        }
+        else
+        {
+            oled.clear();
+
+            oled.print("Error ");
+            oled.print(SDCard[i]);
+
+            delay(500);
+            systemHardReset();
+
+            while (1)
+            {
+            }
+        }
+    }
+}
+
+/*
+   Serial.print("Date:  ");
+    Serial.print(rtclock.day());
+    Serial.print("- ");
+    Serial.print(rtclock.month());
+    Serial.print("  ");
+    Serial.print(rtclock.year() + 1970);
+    Serial.print("  ");
+    Serial.print(weekday1[rtclock.weekday()]);
+    Serial.print("  Time: ");
+    Serial.print(rtclock.hour());
+    Serial.print(" : ");
+    Serial.print(rtclock.minute());
+    Serial.print(" : ");
+    Serial.println(rtclock.second());
+    */

@@ -100,14 +100,10 @@ float phMeasure() //polls the atlas sensor for PH and takes avrages. Retuns ph (
     return ph_float;
 }
 
-float sortPH(int samples) //this function sorts samples and avreges them
+float sortPH() //this function sorts samples and avreges them
 {
-    samples = samples - 1;
+    int samples = 6;
 
-    if (samples < 3) //return 0 if are to sort less than three samples
-    {
-        return 0;
-    }
 
 #ifdef debugMSG
 
@@ -115,10 +111,15 @@ float sortPH(int samples) //this function sorts samples and avreges them
     //oled.setInverseFont(1);
     oled.drawUTF8(0, 0, "Getting PH");
 #endif
-    float buf[20] = {};
+    float buf[6] = {};
     for (size_t i = 0; i < samples; i++) //get (int samples) from the atles EZO and store them in buf[]
     {
         buf[i] = phMeasure();
+        if (buf[i] > 100 ||
+            buf[i] < 2) //if we there was a error retuned,or low value,  dont save it.
+        {
+            i--;
+        }
 
 #ifdef debugMSG
 
@@ -132,7 +133,7 @@ float sortPH(int samples) //this function sorts samples and avreges them
 
     for (int i = 0; i < samples; i++) //sort the analog from small to large
     {
-        for (int j = i + 1; j < 20; j++)
+        for (int j = i + 1; j < samples; j++)
         {
             if (buf[i] > buf[j])
             {
@@ -239,8 +240,6 @@ void PHSleep()
     delay(50);
 }
 
-
-
 int PHLED(int on)
 {
     int state = on;
@@ -324,7 +323,8 @@ void setup()                    //hardware initialization.
 void loop() {                                                             //the main loop.
 
   if (Serial.available() > 0) {                                           //if data is holding in the serial buffer
-    received_from_computer = Serial.readBytesUntil(13, computerdata, 20); //we read the data sent from the serial monitor(pc/mac/other) until we see a <CR>. We also count how many characters have been received.
+    received_from_computer = Serial.readBytesUntil(13, computerdata, 20); //we read the data sent from the serial monitor(pc/mac/other) until we see a
+     <CR>. We also count how many characters have been received.
     computerdata[received_from_computer] = 0;                             //stop the buffer from transmitting leftovers or garbage.
     computerdata[0] = tolower(computerdata[0]);                           //we make sure the first char in the string is lower case.
     if (computerdata[0] == 'c' || computerdata[0] == 'r')time_ = 900;     //if a command has been sent to calibrate or take a reading we wait 1800ms so that the circuit has time to take the reading.

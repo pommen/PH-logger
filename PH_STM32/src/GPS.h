@@ -16,8 +16,8 @@ void syncGPS()
 
             CurrentTime = (31556926 * (gps.date.year() - 1970));
             CurrentTime += (86400 * totalDays);
-            CurrentTime += (86400 * gps.date.day());
-            CurrentTime += (3600 * (gps.time.hour() + 11)); //+11 pga timezone?
+            CurrentTime += (86400 * gps.date.day()) - 86400; //visar datum+1 annars
+            CurrentTime += (3600 * (gps.time.hour() + 11));  //+11 pga timezone?
             CurrentTime += (60 * gps.time.minute());
             CurrentTime += gps.time.second();
             rt.setTime(CurrentTime);
@@ -71,9 +71,9 @@ void startGPS()
                   }
             }
       }
-      gpsLAT = gps.location.lat()*1000000;
-      gpsLONG = gps.location.lng()*1000000;
-  /*     oled.clear();
+      gpsLAT = gps.location.lat() * 1000000;
+      gpsLONG = gps.location.lng() * 1000000;
+      /*     oled.clear();
       oled.println(gpsLAT);
       oled.println(gpsLONG);
 

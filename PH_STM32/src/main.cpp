@@ -27,18 +27,26 @@ Serial.print("Some debug stuff follows");
 #include "SdFat.h"
 #include <U8x8lib.h>
 #include <TinyGPS++.h>
+#include <Adafruit_ADS1015.h>
+#include <math.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
 //#include "FreeStack.h"
+#define ONE_WIRE_BUS PA1
 
 //Objects:
+Adafruit_ADS1115 ads; /* Use this for the 16-bit version */
 File dataFile;
 SdFat SD(1);
 SdFat sd2(2);
-// SdFatEX sd2(2);
 RTClock rt(RTCSEL_LSE);
 TinyGPSPlus gps;
 U8X8_SSD1306_128X32_UNIVISION_HW_I2C oled(/* reset=*/U8X8_PIN_NONE, /* clock=*/PB6, /* data=*/PB7);
-time_t tt1;
+OneWire oneWire(ONE_WIRE_BUS);       // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
+DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature.
 
+//time_t tt1;
 //Pins:
 const uint8_t SD2_CS = PB12;   // chip select for sd2
 const uint8_t SD_CS_PIN = PA4; //CS till SD kort
@@ -49,6 +57,7 @@ const int loggingTypePin = PA9; //connected to a flipswitch that idecates what k
 long int alarmDelay = 10; //this number +1 sec is the sleep time
 uint32_t CurrentTime = 0;
 char weekday1[][7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}; // 0,1,2,3,4,5,6
+
 //*******************************************************************************************************
 //#define debugMSG 1 //uncomment this to get deMSG to OLED. Spammy and uses more space
 //*******************************************************************************************************
@@ -63,27 +72,33 @@ boolean bootUpDone = 0;
 int PHaddress = 99;
 
 //protos:
-static void smartDelay(unsigned long ms); //parse GPS while waiting
 //void gpsTest();                           //OLD test rutine
 void startGPS(); //boot GPS up and get fix
 //void displayInfo();                       //OLD GPS rutine
-void SDBoilerPlate();           //Print the boiler plate to SD card. when starting a new log
-void reInitOled();              //Powerup OLED disp after sleepmode
-void initSD();                  //Init SD
-void sleep();                   //Powersave mode
-void EZOStatus();               //asking EZO vcc and reason for last restart.
-void bootUp();                  //check that things are booted up and functioning.
-void syncGPS();                 //sync to gps time
-void systemHardReset(void);     //reset MCU
-int PHLED(int on);              //toggle the LED on or off the EZO sensor board
-void PHSleep();                 //Sets the EZO in sleepmode. send i2c to wake up
-void LoggingtypeAndFileNames(); //Here we find ou what kind of logging we should do and generate filenames for them.
-
+static void smartDelay(unsigned long ms);                               //parse GPS while waiting
+void SDBoilerPlate();                                                   //Print the boiler plate to SD card. when starting a new log
+void reInitOled();                                                      //Powerup OLED disp after sleepmode
+void initSD();                                                          //Init SD
+void sleep();                                                           //Powersave mode
+void EZOStatus();                                                       //asking EZO vcc and reason for last restart.
+void bootUp();                                                          //check that things are booted up and functioning.
+void syncGPS();                                                         //sync to gps time
+void systemHardReset(void);                                             //reset MCU
+int PHLED(int on);                                                      //toggle the LED on or off the EZO sensor board
+void PHSleep();                                                         //Sets the EZO in sleepmode. send i2c to wake up
+void LoggingtypeAndFileNames();                                         //Here we find ou what kind of logging we should do and generate filenames for them.
+void spotcheckLogging();                                                //Do a check, log it to SD, sound a Buzer and poer off
+void longTimeLogging();                                                 //Logg every n'th minute and go to sleep
+void writeToFile(float airTemp, float waterTemp, float ph, float Volt); //puts the log results in the SD's funtion to contain error checking between the cards?
+float getAirTemp();                                                     //samples and feeds back the air temp
+float getWaterTemp();                                                   //samples the and feeds back the water temp (Thermistor, or Ktype?)
+float getBattVolt();                                                    //Gets the battery voltage (ADS1115?)
 //My files:
 
 #include <PH.h>     //Atlas PH stuff
 #include <GPS.h>    //GPS stuff
 #include <SDcard.h> //SD card stuff
+#include <temperatures.h>
 
 void setup()
 {
@@ -110,7 +125,9 @@ void setup()
       oled.setFlipMode(1);
       oled.drawUTF8(0, 0, "Starting");
       // oled.println("Starting");
-
+      ads.begin();
+      ads.setGain(GAIN_TWOTHIRDS);
+      sensors.begin();
       adc_disable_all();
       //setGPIOModeToAllPins(GPIO_INPUT_ANALOG);
       //gpsTest();
@@ -141,13 +158,20 @@ void bootUp()
 
       temp = PHLED(temp);
 #endif
-    
+
       EZOStatus();
       bootUpDone = 1;
 }
 
 void loop()
 {
+      if (loggingType == 1)
+      {
+            spotcheckLogging();
+      }
+      else
+            longTimeLogging();
+
       float temp = phMeasure();
       oled.print(temp);
       temp = 0;
@@ -156,6 +180,34 @@ void loop()
 
       //go back to sleep
       sleep();
+}
+
+void longTimeLogging()
+{
+      while (1)
+      {
+            // float phtemp = sortPH(10);
+            //float airTemp = getAirTemp();
+            //float waterTemp = getWaterTemp();
+            //float Volt=getBattVolt();
+            // writeToFile( airTemp, waterTemp, float ph, Volt);
+
+            sleep();
+      }
+}
+
+void spotcheckLogging()
+{
+      //  writeToFile(float airTemp, float waterTemp, sortPH(10), float Volt);
+      writeToFile(dallasTemp(), Thermistor(), sortPH(), 4.15);
+      //Buzzer
+      //Shutdown --HOW??
+      oled.clear();
+      oled.print("DONE!");
+      while(1){
+            /* code */
+      }
+      
 }
 
 void LoggingtypeAndFileNames()
@@ -247,6 +299,7 @@ void reInitOled()
       oled.begin();
       oled.clear();
       oled.home();
+      oled.setFlipMode(1);
 }
 
 void sleep()
@@ -268,7 +321,7 @@ void sleep()
       sleepAndWakeUp(STOP, &rt, alarmDelay); //sleep for "alarmDelay" secs - 1
 
       //Woken up from sleep
-      rcc_clk_init(RCC_CLKSRC_HSI, RCC_PLLSRC_HSE, RCC_PLLMUL_9); // 72MHz  => 48 mA  -- datasheet value           => between 40 and 41mA
+      rcc_clk_init(RCC_CLKSRC_HSI, RCC_PLLSRC_HSE, RCC_PLLMUL_9); // 72MHz  => 48 mA  -- datasheet value  => between 40 and 41mA
 
       reInitOled(); //starting OLED again
       digitalWrite(LED_BUILTIN, LOW);
