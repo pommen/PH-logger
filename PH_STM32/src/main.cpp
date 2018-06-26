@@ -53,6 +53,7 @@ const uint8_t SD_CS_PIN = PA4; //CS till SD kort
 const int GPSPower = PB1;
 const int PHPower = PA10;
 const int loggingTypePin = PA9; //connected to a flipswitch that idecates what kind of logging we want.
+const int BatteryVoltagePin = PA0; //through a voltage divider to measure battery voltage. 
 //Globals:
 long int alarmDelay = 10; //this number +1 sec is the sleep time
 uint32_t CurrentTime = 0;

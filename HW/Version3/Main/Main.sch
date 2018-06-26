@@ -59,17 +59,6 @@ F 3 "" H 9350 5800 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Peters:Si4435 Q1
-U 1 1 5B2F64C6
-P 3350 7150
-F 0 "Q1" H 3556 7196 50  0000 L CNN
-F 1 "Si4435" H 3556 7105 50  0000 L CNN
-F 2 "Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm" H 3100 7450 50  0001 C CNN
-F 3 "https://www.vishay.com/docs/72123/72123.pdf" H 3200 7550 50  0001 C CNN
-	1    3350 7150
-	-1   0    0    -1  
-$EndComp
-$Comp
 L Peters:EZ_PH U9
 U 1 1 5B2F7952
 P 9500 3650
@@ -679,8 +668,6 @@ Wire Wire Line
 Wire Wire Line
 	3250 6350 3250 6450
 Connection ~ 2550 6350
-Wire Wire Line
-	3250 7450 3250 7350
 $Comp
 L device:R R3
 U 1 1 5B30118E
@@ -692,8 +679,6 @@ F 3 "~" H 3650 7350 50  0001 C CNN
 	1    3650 7350
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3550 7150 3650 7150
 Wire Wire Line
 	3650 7150 3650 7200
 Wire Wire Line
@@ -2059,4 +2044,19 @@ Wire Wire Line
 	6600 7500 6500 7500
 Wire Wire Line
 	5900 7250 6650 7250
+$Comp
+L Peters:IRF7341 Q?
+U 1 1 5B4CBA24
+P 3350 7150
+F 0 "Q?" H 3540 7203 60  0000 L CNN
+F 1 "IRF7341" H 2900 7250 60  0000 L CNN
+F 2 "Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm" H 3400 7800 60  0001 C CNN
+F 3 "https://www.infineon.com/dgdl/irf7341.pdf?fileId=5546d462533600a4015355f636411b5d" H 3150 8100 60  0001 C CNN
+	1    3350 7150
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	3250 7350 3250 7450
+Wire Wire Line
+	3450 7150 3650 7150
 $EndSCHEMATC
