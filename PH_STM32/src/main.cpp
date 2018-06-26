@@ -33,7 +33,7 @@ Serial.print("Some debug stuff follows");
 #include <DallasTemperature.h>
 
 //#include "FreeStack.h"
-#define ONE_WIRE_BUS PA1
+#define ONE_WIRE_BUS PB1
 
 //Objects:
 Adafruit_ADS1115 ads; /* Use this for the 16-bit version */
