@@ -1,0 +1,527 @@
+EESchema Schematic File Version 4
+LIBS:external temp-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 2 2
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Peters:DS92LV010A U?
+U 1 1 5B43E48B
+P 2450 1200
+AR Path="/5B43E48B" Ref="U?"  Part="1" 
+AR Path="/5B43E0E1/5B43E48B" Ref="U5"  Part="1" 
+F 0 "U5" H 2425 1375 50  0000 C CNN
+F 1 "DS92LV010A" H 2425 1284 50  0000 C CNN
+F 2 "Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm" H 2050 1600 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/ds92lv010a.pdf" H 1950 1700 50  0001 C CNN
+	1    2450 1200
+	1    0    0    -1  
+$EndComp
+$Comp
+L device:R_Small R?
+U 1 1 5B43E492
+P 3700 1400
+AR Path="/5B43E492" Ref="R?"  Part="1" 
+AR Path="/5B43E0E1/5B43E492" Ref="R8"  Part="1" 
+F 0 "R8" H 3759 1446 50  0000 L CNN
+F 1 "54R" H 3759 1355 50  0000 L CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" H 3700 1400 50  0001 C CNN
+F 3 "~" H 3700 1400 50  0001 C CNN
+	1    3700 1400
+	1    0    0    -1  
+$EndComp
+$Comp
+L device:C_Small C?
+U 1 1 5B43E499
+P 7750 1600
+AR Path="/5B43E499" Ref="C?"  Part="1" 
+AR Path="/5B43E0E1/5B43E499" Ref="C7"  Part="1" 
+F 0 "C7" H 7842 1646 50  0000 L CNN
+F 1 "100n" H 7842 1555 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 7750 1600 50  0001 C CNN
+F 3 "~" H 7750 1600 50  0001 C CNN
+	1    7750 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR?
+U 1 1 5B43E4A0
+P 7750 1500
+AR Path="/5B43E4A0" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B43E4A0" Ref="#PWR0120"  Part="1" 
+F 0 "#PWR0120" H 7750 1350 50  0001 C CNN
+F 1 "VCC" H 7767 1673 50  0000 C CNN
+F 2 "" H 7750 1500 50  0001 C CNN
+F 3 "" H 7750 1500 50  0001 C CNN
+	1    7750 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5B43E4A6
+P 7750 1700
+AR Path="/5B43E4A6" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B43E4A6" Ref="#PWR0121"  Part="1" 
+F 0 "#PWR0121" H 7750 1450 50  0001 C CNN
+F 1 "GND" H 7755 1527 50  0000 C CNN
+F 2 "" H 7750 1700 50  0001 C CNN
+F 3 "" H 7750 1700 50  0001 C CNN
+	1    7750 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5B43E4AC
+P 2950 1900
+AR Path="/5B43E4AC" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B43E4AC" Ref="#PWR0122"  Part="1" 
+F 0 "#PWR0122" H 2950 1650 50  0001 C CNN
+F 1 "GND" H 2955 1727 50  0000 C CNN
+F 2 "" H 2950 1900 50  0001 C CNN
+F 3 "" H 2950 1900 50  0001 C CNN
+	1    2950 1900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2950 1750 2950 1900
+Wire Wire Line
+	2950 1250 3350 1250
+Wire Wire Line
+	3700 1250 3700 1300
+Wire Wire Line
+	2950 1550 3500 1550
+Wire Wire Line
+	3700 1550 3700 1500
+Connection ~ 3700 1250
+Connection ~ 3700 1550
+Text HLabel 4850 1250 2    50   Input ~ 0
+SDA+
+Text HLabel 4800 3950 2    50   Input ~ 0
+SCL+
+Text HLabel 4850 1550 2    50   Input ~ 0
+SDA-
+Text HLabel 4800 3650 2    50   Input ~ 0
+SCL-
+$Comp
+L power:VCC #PWR?
+U 1 1 5B43FED6
+P 1900 1200
+AR Path="/5B43FED6" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B43FED6" Ref="#PWR0123"  Part="1" 
+F 0 "#PWR0123" H 1900 1050 50  0001 C CNN
+F 1 "VCC" H 1917 1373 50  0000 C CNN
+F 2 "" H 1900 1200 50  0001 C CNN
+F 3 "" H 1900 1200 50  0001 C CNN
+	1    1900 1200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1900 1250 1900 1200
+Wire Wire Line
+	3700 1550 3500 1550
+Wire Wire Line
+	3700 1250 3350 1250
+Text HLabel 1300 1500 0    50   Input ~ 0
+SDA
+Wire Wire Line
+	1900 1350 1900 1250
+Connection ~ 1900 1250
+$Comp
+L Peters:DS92LV010A U?
+U 1 1 5B440238
+P 2500 2250
+AR Path="/5B440238" Ref="U?"  Part="1" 
+AR Path="/5B43E0E1/5B440238" Ref="U7"  Part="1" 
+F 0 "U7" H 2475 2425 50  0000 C CNN
+F 1 "DS92LV010A" H 2475 2334 50  0000 C CNN
+F 2 "Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm" H 2100 2650 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/ds92lv010a.pdf" H 2000 2750 50  0001 C CNN
+	1    2500 2250
+	1    0    0    -1  
+$EndComp
+$Comp
+L device:C_Small C?
+U 1 1 5B440244
+P 7400 1600
+AR Path="/5B440244" Ref="C?"  Part="1" 
+AR Path="/5B43E0E1/5B440244" Ref="C6"  Part="1" 
+F 0 "C6" H 7492 1646 50  0000 L CNN
+F 1 "100n" H 7492 1555 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 7400 1600 50  0001 C CNN
+F 3 "~" H 7400 1600 50  0001 C CNN
+	1    7400 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR?
+U 1 1 5B44024A
+P 7400 1500
+AR Path="/5B44024A" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B44024A" Ref="#PWR0124"  Part="1" 
+F 0 "#PWR0124" H 7400 1350 50  0001 C CNN
+F 1 "VCC" H 7417 1673 50  0000 C CNN
+F 2 "" H 7400 1500 50  0001 C CNN
+F 3 "" H 7400 1500 50  0001 C CNN
+	1    7400 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5B440250
+P 7400 1700
+AR Path="/5B440250" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B440250" Ref="#PWR0125"  Part="1" 
+F 0 "#PWR0125" H 7400 1450 50  0001 C CNN
+F 1 "GND" H 7405 1527 50  0000 C CNN
+F 2 "" H 7400 1700 50  0001 C CNN
+F 3 "" H 7400 1700 50  0001 C CNN
+	1    7400 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5B440256
+P 3000 2950
+AR Path="/5B440256" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B440256" Ref="#PWR0126"  Part="1" 
+F 0 "#PWR0126" H 3000 2700 50  0001 C CNN
+F 1 "GND" H 3005 2777 50  0000 C CNN
+F 2 "" H 3000 2950 50  0001 C CNN
+F 3 "" H 3000 2950 50  0001 C CNN
+	1    3000 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3000 2800 3000 2950
+$Comp
+L power:VCC #PWR?
+U 1 1 5B440263
+P 1950 2250
+AR Path="/5B440263" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B440263" Ref="#PWR0127"  Part="1" 
+F 0 "#PWR0127" H 1950 2100 50  0001 C CNN
+F 1 "VCC" H 1967 2423 50  0000 C CNN
+F 2 "" H 1950 2250 50  0001 C CNN
+F 3 "" H 1950 2250 50  0001 C CNN
+	1    1950 2250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1950 2300 1950 2250
+$Comp
+L power:GND #PWR?
+U 1 1 5B4406B1
+P 1950 2950
+AR Path="/5B4406B1" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B4406B1" Ref="#PWR0128"  Part="1" 
+F 0 "#PWR0128" H 1950 2700 50  0001 C CNN
+F 1 "GND" H 1955 2777 50  0000 C CNN
+F 2 "" H 1950 2950 50  0001 C CNN
+F 3 "" H 1950 2950 50  0001 C CNN
+	1    1950 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1950 2800 1950 2950
+$Comp
+L device:R R6
+U 1 1 5B440BB6
+P 1500 2050
+F 0 "R6" H 1570 2096 50  0000 L CNN
+F 1 "0R" H 1570 2005 50  0000 L CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 1430 2050 50  0001 C CNN
+F 3 "~" H 1500 2050 50  0001 C CNN
+	1    1500 2050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1500 2200 1500 2650
+Wire Wire Line
+	1500 2650 1950 2650
+Wire Wire Line
+	1500 1900 1500 1500
+Wire Wire Line
+	1300 1500 1500 1500
+Connection ~ 1500 1500
+Wire Wire Line
+	1500 1500 1900 1500
+Wire Wire Line
+	3000 2300 3350 2300
+Wire Wire Line
+	3350 2300 3350 1250
+Connection ~ 3350 1250
+Wire Wire Line
+	3000 2600 3500 2600
+Wire Wire Line
+	3500 2600 3500 1550
+Connection ~ 3500 1550
+Wire Wire Line
+	3700 1550 4850 1550
+Wire Wire Line
+	3700 1250 4850 1250
+$Comp
+L Peters:DS92LV010A U?
+U 1 1 5B4419E8
+P 2400 3600
+AR Path="/5B4419E8" Ref="U?"  Part="1" 
+AR Path="/5B43E0E1/5B4419E8" Ref="U4"  Part="1" 
+F 0 "U4" H 2375 3775 50  0000 C CNN
+F 1 "DS92LV010A" H 2375 3684 50  0000 C CNN
+F 2 "Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm" H 2000 4000 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/ds92lv010a.pdf" H 1900 4100 50  0001 C CNN
+	1    2400 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L device:R_Small R?
+U 1 1 5B4419EE
+P 3650 3800
+AR Path="/5B4419EE" Ref="R?"  Part="1" 
+AR Path="/5B43E0E1/5B4419EE" Ref="R7"  Part="1" 
+F 0 "R7" H 3709 3846 50  0000 L CNN
+F 1 "54R" H 3709 3755 50  0000 L CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" H 3650 3800 50  0001 C CNN
+F 3 "~" H 3650 3800 50  0001 C CNN
+	1    3650 3800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5B4419F4
+P 2900 4300
+AR Path="/5B4419F4" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B4419F4" Ref="#PWR0129"  Part="1" 
+F 0 "#PWR0129" H 2900 4050 50  0001 C CNN
+F 1 "GND" H 2905 4127 50  0000 C CNN
+F 2 "" H 2900 4300 50  0001 C CNN
+F 3 "" H 2900 4300 50  0001 C CNN
+	1    2900 4300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2900 4150 2900 4300
+Wire Wire Line
+	2900 3650 3300 3650
+Wire Wire Line
+	3650 3650 3650 3700
+Wire Wire Line
+	2900 3950 3450 3950
+Wire Wire Line
+	3650 3950 3650 3900
+Connection ~ 3650 3650
+Connection ~ 3650 3950
+$Comp
+L power:VCC #PWR?
+U 1 1 5B441A03
+P 1850 3600
+AR Path="/5B441A03" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B441A03" Ref="#PWR0130"  Part="1" 
+F 0 "#PWR0130" H 1850 3450 50  0001 C CNN
+F 1 "VCC" H 1867 3773 50  0000 C CNN
+F 2 "" H 1850 3600 50  0001 C CNN
+F 3 "" H 1850 3600 50  0001 C CNN
+	1    1850 3600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1850 3650 1850 3600
+Wire Wire Line
+	3650 3950 3450 3950
+Wire Wire Line
+	3650 3650 3300 3650
+Text HLabel 1250 3900 0    50   Input ~ 0
+SCL
+$Comp
+L Peters:DS92LV010A U?
+U 1 1 5B441A0F
+P 2450 4650
+AR Path="/5B441A0F" Ref="U?"  Part="1" 
+AR Path="/5B43E0E1/5B441A0F" Ref="U6"  Part="1" 
+F 0 "U6" H 2425 4825 50  0000 C CNN
+F 1 "DS92LV010A" H 2425 4734 50  0000 C CNN
+F 2 "Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm" H 2050 5050 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/ds92lv010a.pdf" H 1950 5150 50  0001 C CNN
+	1    2450 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5B441A15
+P 2950 5350
+AR Path="/5B441A15" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B441A15" Ref="#PWR0131"  Part="1" 
+F 0 "#PWR0131" H 2950 5100 50  0001 C CNN
+F 1 "GND" H 2955 5177 50  0000 C CNN
+F 2 "" H 2950 5350 50  0001 C CNN
+F 3 "" H 2950 5350 50  0001 C CNN
+	1    2950 5350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2950 5200 2950 5350
+$Comp
+L power:VCC #PWR?
+U 1 1 5B441A1C
+P 1900 4650
+AR Path="/5B441A1C" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B441A1C" Ref="#PWR0132"  Part="1" 
+F 0 "#PWR0132" H 1900 4500 50  0001 C CNN
+F 1 "VCC" H 1917 4823 50  0000 C CNN
+F 2 "" H 1900 4650 50  0001 C CNN
+F 3 "" H 1900 4650 50  0001 C CNN
+	1    1900 4650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1900 4700 1900 4650
+$Comp
+L power:GND #PWR?
+U 1 1 5B441A23
+P 1900 5350
+AR Path="/5B441A23" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B441A23" Ref="#PWR0133"  Part="1" 
+F 0 "#PWR0133" H 1900 5100 50  0001 C CNN
+F 1 "GND" H 1905 5177 50  0000 C CNN
+F 2 "" H 1900 5350 50  0001 C CNN
+F 3 "" H 1900 5350 50  0001 C CNN
+	1    1900 5350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1900 5200 1900 5350
+$Comp
+L device:R R5
+U 1 1 5B441A2A
+P 1450 4450
+F 0 "R5" H 1520 4496 50  0000 L CNN
+F 1 "0R" H 1520 4405 50  0000 L CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 1380 4450 50  0001 C CNN
+F 3 "~" H 1450 4450 50  0001 C CNN
+	1    1450 4450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1450 4600 1450 5050
+Wire Wire Line
+	1450 5050 1900 5050
+Wire Wire Line
+	1450 4300 1450 3900
+Wire Wire Line
+	1250 3900 1450 3900
+Connection ~ 1450 3900
+Wire Wire Line
+	1450 3900 1850 3900
+Wire Wire Line
+	2950 4700 3300 4700
+Wire Wire Line
+	3300 4700 3300 3650
+Connection ~ 3300 3650
+Wire Wire Line
+	2950 5000 3450 5000
+Wire Wire Line
+	3450 5000 3450 3950
+Connection ~ 3450 3950
+Wire Wire Line
+	3650 3950 4800 3950
+Wire Wire Line
+	3650 3650 4800 3650
+$Comp
+L device:C_Small C?
+U 1 1 5B4437EB
+P 8500 1600
+AR Path="/5B4437EB" Ref="C?"  Part="1" 
+AR Path="/5B43E0E1/5B4437EB" Ref="C9"  Part="1" 
+F 0 "C9" H 8592 1646 50  0000 L CNN
+F 1 "100n" H 8592 1555 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 8500 1600 50  0001 C CNN
+F 3 "~" H 8500 1600 50  0001 C CNN
+	1    8500 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR?
+U 1 1 5B4437F2
+P 8500 1500
+AR Path="/5B4437F2" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B4437F2" Ref="#PWR0134"  Part="1" 
+F 0 "#PWR0134" H 8500 1350 50  0001 C CNN
+F 1 "VCC" H 8517 1673 50  0000 C CNN
+F 2 "" H 8500 1500 50  0001 C CNN
+F 3 "" H 8500 1500 50  0001 C CNN
+	1    8500 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5B4437F8
+P 8500 1700
+AR Path="/5B4437F8" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B4437F8" Ref="#PWR0135"  Part="1" 
+F 0 "#PWR0135" H 8500 1450 50  0001 C CNN
+F 1 "GND" H 8505 1527 50  0000 C CNN
+F 2 "" H 8500 1700 50  0001 C CNN
+F 3 "" H 8500 1700 50  0001 C CNN
+	1    8500 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L device:C_Small C?
+U 1 1 5B4437FE
+P 8150 1600
+AR Path="/5B4437FE" Ref="C?"  Part="1" 
+AR Path="/5B43E0E1/5B4437FE" Ref="C8"  Part="1" 
+F 0 "C8" H 8242 1646 50  0000 L CNN
+F 1 "100n" H 8242 1555 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 8150 1600 50  0001 C CNN
+F 3 "~" H 8150 1600 50  0001 C CNN
+	1    8150 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR?
+U 1 1 5B443805
+P 8150 1500
+AR Path="/5B443805" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B443805" Ref="#PWR0136"  Part="1" 
+F 0 "#PWR0136" H 8150 1350 50  0001 C CNN
+F 1 "VCC" H 8167 1673 50  0000 C CNN
+F 2 "" H 8150 1500 50  0001 C CNN
+F 3 "" H 8150 1500 50  0001 C CNN
+	1    8150 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5B44380B
+P 8150 1700
+AR Path="/5B44380B" Ref="#PWR?"  Part="1" 
+AR Path="/5B43E0E1/5B44380B" Ref="#PWR0137"  Part="1" 
+F 0 "#PWR0137" H 8150 1450 50  0001 C CNN
+F 1 "GND" H 8155 1527 50  0000 C CNN
+F 2 "" H 8150 1700 50  0001 C CNN
+F 3 "" H 8150 1700 50  0001 C CNN
+	1    8150 1700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1850 3750 1850 3650
+Connection ~ 1850 3650
+NoConn ~ 1900 4950
+NoConn ~ 1900 4800
+NoConn ~ 1850 4150
+NoConn ~ 1850 4000
+NoConn ~ 1950 2550
+NoConn ~ 1950 2400
+NoConn ~ 1900 1750
+NoConn ~ 1900 1600
+$EndSCHEMATC
