@@ -210,7 +210,7 @@ void initSD() //Init SD
     if (cardSize == 0)
     {
         oled.println("cardSize1 failed");
-        delay(500);
+        delay(5020);
         systemHardReset();
 
         return;
@@ -221,7 +221,7 @@ void initSD() //Init SD
     if (cardSize == 0)
     {
         oled.println("backup failed");
-        delay(500);
+        delay(5200);
         systemHardReset();
 
         return;
@@ -234,7 +234,7 @@ void initSD() //Init SD
         {
             oled.clear();
             oled.println(F("MkDir 2-1"));
-            delay(500);
+            delay(5200);
             systemHardReset();
         }
     }
@@ -253,7 +253,7 @@ void initSD() //Init SD
         {
             oled.clear();
             oled.println(F("MkDir 1-1"));
-            delay(500);
+            delay(5020);
             systemHardReset();
         }
     }

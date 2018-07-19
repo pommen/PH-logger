@@ -51,12 +51,14 @@ DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Tem
 const uint8_t SD2_CS = PB12;   // chip select for sd2
 const uint8_t SD_CS_PIN = PA4; //CS till SD kort
 const int GPSPower = PB1;
-const int PHPower = PA10;
 const int loggingTypePin = PA9; //connected to a flipswitch that idecates what kind of logging we want.
+
 //Globals:
+//long int alarmDelay = (60 * 10) - 1; //this number +1 sec is the sleep time
 long int alarmDelay = 10; //this number +1 sec is the sleep time
+
 uint32_t CurrentTime = 0;
-char weekday1[][7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}; // 0,1,2,3,4,5,6
+//char weekday1[][7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}; // 0,1,2,3,4,5,6
 
 //*******************************************************************************************************
 //#define debugMSG 1 //uncomment this to get deMSG to OLED. Spammy and uses more space
@@ -70,6 +72,9 @@ long int gpsLONG;
 
 boolean bootUpDone = 0;
 int PHaddress = 99;
+
+float vcc = 0.00;
+float Battvolt = 0.00;
 
 //protos:
 //void gpsTest();                           //OLD test rutine
@@ -93,6 +98,8 @@ void writeToFile(float airTemp, float waterTemp, float ph, float Volt); //puts t
 float getAirTemp();                                                     //samples and feeds back the air temp
 float getWaterTemp();                                                   //samples the and feeds back the water temp (Thermistor, or Ktype?)
 float getBattVolt();                                                    //Gets the battery voltage (ADS1115?)
+float sortThermistor();
+float Thermistor();
 //My files:
 
 #include <PH.h>     //Atlas PH stuff
@@ -109,10 +116,8 @@ void setup()
 
       pinMode(LED_BUILTIN, OUTPUT);
       pinMode(GPSPower, OUTPUT);
-      pinMode(PHPower, OUTPUT);
       pinMode(loggingTypePin, INPUT);
-      digitalWrite(GPSPower, LOW);
-      digitalWrite(PHPower, LOW);
+      digitalWrite(GPSPower, HIGH);
 
       // digitalWrite(LED_BUILTIN, LOW);
       Wire.begin();
@@ -126,9 +131,9 @@ void setup()
       oled.drawUTF8(0, 0, "Starting");
       // oled.println("Starting");
       ads.begin();
-      ads.setGain(GAIN_TWOTHIRDS);
+      //ads.setGain(GAIN_TWOTHIRDS);
       sensors.begin();
-      adc_disable_all();
+      //adc_disable_all();
       //setGPIOModeToAllPins(GPIO_INPUT_ANALOG);
       //gpsTest();
 
@@ -191,6 +196,7 @@ void longTimeLogging()
             //float waterTemp = getWaterTemp();
             //float Volt=getBattVolt();
             // writeToFile( airTemp, waterTemp, float ph, Volt);
+            writeToFile(dallasTemp(), sortThermistor(), sortPH(), 4.15);
 
             sleep();
       }
@@ -199,15 +205,15 @@ void longTimeLogging()
 void spotcheckLogging()
 {
       //  writeToFile(float airTemp, float waterTemp, sortPH(10), float Volt);
-      writeToFile(dallasTemp(), Thermistor(), sortPH(), 4.15);
+      writeToFile(dallasTemp(), sortThermistor(), sortPH(), 4.15);
       //Buzzer
       //Shutdown --HOW??
       oled.clear();
       oled.print("DONE!");
-      while(1){
+      while (1)
+      {
             /* code */
       }
-      
 }
 
 void LoggingtypeAndFileNames()
@@ -322,9 +328,11 @@ void sleep()
 
       //Woken up from sleep
       rcc_clk_init(RCC_CLKSRC_HSI, RCC_PLLSRC_HSE, RCC_PLLMUL_9); // 72MHz  => 48 mA  -- datasheet value  => between 40 and 41mA
+      digitalWrite(GPSPower, LOW); //this should be the last ting we do in setup
 
       reInitOled(); //starting OLED again
       digitalWrite(LED_BUILTIN, LOW);
+
 #ifdef debugMSG
 
       /* code */
