@@ -12,7 +12,7 @@ i2c adresses
 // See http://stm32duino.com/viewtopic.php?f=15&t=132&hilit=rtc&start=40 for a more details about the RTC NVRam
 // 10x 16 bit registers are available on the STM32F103CXXX more on the higher density device.
 
-
+20/7
 #ifdef debugMSG
 Serial.print("Some debug stuff follows");
 // More debug code...
