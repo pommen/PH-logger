@@ -41,7 +41,9 @@ December - 31 days
 
 void startGPS()
 {
-      digitalWrite(GPSPower, HIGH);
+//gps Power starts HIGH
+//      digitalWrite(GPSPower, HIGH);
+
       unsigned int numSats = 1;
       delay(250);
 
