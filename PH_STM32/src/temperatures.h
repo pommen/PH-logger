@@ -1,20 +1,61 @@
 
 
-/*
-   Thermisor connections:
- *
- *                  Analog pin 0
- *                        |
- *    5V |-----/\/\/\-----+-----/\/\/\-----| GND
- *
- *               ^                ^
- *        10K thermistor     10K resistor
+const int addr = 0x18;
 
+byte internalTemp = 0;
+byte extTempMSB = 0;
+byte extTempLSB = 0;
+byte status = 0;
+int tempComp = 2; //This shold be calibrated, and not har set.
+float extTemp = 0.000;
 
- */
-
-float sortThermistor() //this function sorts samples and avreges them
+float getTemperatures(int external) //this function sorts samples and avreges them
 {
+    float sendback = 0.00;
+    if (external == 0)
+    {
+        //get the internal temp
+        //00                      Not Applicable          Local Temperature Value                          1000 0000 (0x80) (−128C)
+        Wire.beginTransmission(addr);
+        Wire.write(0x00);
+        Wire.endTransmission();
+        delay(50);
+
+        Wire.requestFrom(addr, 1);
+        internalTemp = Wire.read();
+        delay(50);
+        sendback = internalTemp;
+    }
+
+    if (external == 1)
+    {
+
+        //01                       Not Applicable         Remote Temperature Value High Byte               1000 0000 (0x80) (−128C)
+        Wire.beginTransmission(addr);
+        Wire.write(0x01);
+        Wire.endTransmission();
+
+        Wire.requestFrom(addr, 1);
+        extTempMSB = Wire.read();
+        delay(100);
+
+        //10                      Not Applicable          Remote Temperature Value Low Byte                0000 0000
+        Wire.beginTransmission(addr);
+        Wire.write(0x10);
+        Wire.endTransmission();
+
+        Wire.requestFrom(addr, 1);
+        extTempLSB = Wire.read();
+
+        extTempLSB = extTempLSB / 32;
+        extTemp = extTempLSB * 0.125;
+        extTemp += extTempMSB;
+        sendback = extTemp + tempComp;
+    }
+    // extTemp += extTempLSB * 0.125;
+
+    /*
+
     int samples = 6;
 
     float buf[6] = {};
@@ -54,87 +95,48 @@ float sortThermistor() //this function sorts samples and avreges them
     }
     avgValue = avgValue / onethird;
     return avgValue;
+
+    */
+
+    return sendback;
 }
 
-float Thermistor()
+void temperatureCal()
 {
-    
+    int internalTemp=getTemperatures(0);
+    float externalTemp = getTemperatures(1);
 
-    //*************************
-    int seriesResistor = 10000; //10Kohm
-    float multiplier = 0.1875F; /* ADS1115  @ +/- 6.144V gain (16-bit results) */
-    float IseriesResistor = 0.000;
-    float VoltOverseriesResistance = 0.000;
-    float VoltOverThermistor = 0.000;
-    //float ThmeristorResistans = 0.00;
 
-    VoltOverseriesResistance = (ads.readADC_Differential_0_1() * multiplier); //dropp över den fasta resistorn
-    delay(400);
-    VoltOverThermistor = (ads.readADC_Differential_2_3() * multiplier);
-
-    IseriesResistor = VoltOverseriesResistance / seriesResistor;
-    long Resistance = VoltOverThermistor / IseriesResistor;
-    // Serial.print("Themristor Resistans: ");
-    // Serial.println(Resistance);
-    float Temp;             // Dual-Purpose variable to save space.
-    Temp = log(Resistance); // Saving the Log(resistance) so not to calculate  it 4 times later
-    Temp = 1 / (0.001129148 + (0.000234125 * Temp) + (0.0000000876741 * Temp * Temp * Temp));
-    Temp = Temp - 273.15; // Convert Kelvin to Celsius
-    return Temp;          // Return the Temperature
 }
-
-float dallasTemp()
-{
-
-    // call sensors.requestTemperatures() to issue a global temperature
-    // request to all devices on the bus
-
-#ifdef debugMSG
-    oled.clear();
-    oled.print("Req temps...");
-
-#endif
-    sensors.requestTemperatures(); // Send the command to get temperatures
-
-#ifdef debugMSG
-    oled.clear();
-    // oled.print("Sleeping");
-    oled.println("DONE");
-    delay(1000);
-    // After we got the temperatures, we can print them here.
-    // We use the function ByIndex, and as an example get the temperature from the first sensor only.
-    oled.println("Temperature : ");
-    oled.println(sensors.getTempCByIndex(0));
-#endif
-
-    return sensors.getTempCByIndex(0);
-}
-
 /*
- * Inputs ADC Value from Thermistor and outputs Temperature in Celsius
- *  requires: include <math.h>
- * Utilizes the Steinhart-Hart Thermistor Equation:
- *    Temperature in Kelvin = 1 / {A + B[ln(R)] + C[ln(R)]3}
- *    where A = 0.001129148, B = 0.000234125 and C = 8.76741E-08
- *
- * These coefficients seem to work fairly universally, which is a bit of a 
- * surprise. 
- *
- * Schematic:
- *   [Ground] -- [10k-pad-resistor] -- | -- [thermistor] --[Vcc (5 or 3.3v)]
- *                                               |
- *                                          Analog Pin 0
- *
- * In case it isn't obvious (as it wasn't to me until I thought about it), the analog ports
- * measure the voltage between 0v -> Vcc which for an Arduino is a nominal 5v, but for (say) 
- * a JeeNode, is a nominal 3.3v.
- *
- * The resistance calculation uses the ratio of the two resistors, so the voltage
- * specified above is really only required for the debugging that is commented out below
- *
- * Resistance = PadResistor * (1024/ADC -1)  
- *
- * I have used this successfully with some CH Pipe Sensors (http://www.atcsemitec.co.uk/pdfdocs/ch.pdf)
- * which be obtained from http://www.rapidonline.co.uk.
- *
- */
+
+Table 7. LIST OF ADM1023 REGISTERS
+
+Read Address (Hex)       Write Address (Hex)         Name                                       Power-on Default
+
+Not Applicable          Not Applicable          Address Pointer                                     Undefined
+00                      Not Applicable          Local Temperature Value                          1000 0000 (0x80) (−128C)
+01                       Not Applicable         Remote Temperature Value High Byte               1000 0000 (0x80) (−128C)
+02                      Not Applicable          Status                                           Undefined
+03                      09                      Configuration                                    0000 0000 (0x00)
+04                      0A                      Conversion Rate                                  0000 0010 (0x02)
+05                      0B                      Local Temperature High Limit                     0111 1111 (0x7F) (+127C)
+06                      0C                      Local Temperature Low Limit                      1100 1001 (0xC9) (−55C)
+07                      0D                      Remote Temperature High Limit High Byte          0111 1111 (0x7F) (+127C)
+08                      0E                      Remote Temperature Low Limit High Byte           1100 1001 (0xC9) (−55C)
+Not Applicable          0F (Note 1) One-shot
+10                      Not Applicable          Remote Temperature Value Low Byte                0000 0000
+11                      11                      Remote Temperature Offset High Byte              0000 0000
+12                      12                      Remote Temperature Offset Low Byte               0000 0000
+13                      13                      Remote Temperature High Limit Low Byte           0000 0000
+14                      14                      Remote Temperature Low Limit Low Byte            0000 0000
+19                      Not Applicable          Reserved                                         0000 0000
+20                      21                      Reserved                                         Undefined
+FE                      Not Applicable          Manufacturer Device ID                           0100 0001 (0x41)
+FF                      Not Applicable          Die Revision Code                                0011 xxxx (0x3x)
+
+
+1. Writing to Address 0F causes the ADM1023 to perform a single measurement. It is not a data register as such; thus, it does not matter what
+data is written to it.
+
+*/

@@ -178,8 +178,7 @@ void SDBoilerPlate()
     }
 }
 
-
-void initSD() //Init SD
+int initSD() //Init SD
 {
     if (!SD.begin(SD_CS_PIN, SPI_HALF_SPEED /*SPI_FULL_SPEED*/))
     {
@@ -188,8 +187,8 @@ void initSD() //Init SD
         oled.println(F("Card1 failed"));
         oled.println(F("or not present"));
         delay(1000); // don't do anything more:
-        systemHardReset();
-        return;
+        //systemHardReset();
+        return 0;
     }
     oled.println(F("card1 Init."));
     if (!sd2.begin(SD2_CS, SPI_HALF_SPEED /*SPI_FULL_SPEED*/))
@@ -199,11 +198,11 @@ void initSD() //Init SD
         oled.println(F("Backup failed"));
         oled.println(F("or not present"));
         delay(1000); // don't do anything more:
-        systemHardReset();
-        return;
+                     // systemHardReset();
+        return 0;
     }
     oled.println(F("backup Init."));
-
+    delay(1000);
     // Serial.print(F("card initialized."));
 
     int cardSize = SD.card()->cardSize();
@@ -211,9 +210,9 @@ void initSD() //Init SD
     {
         oled.println("cardSize1 failed");
         delay(5020);
-        systemHardReset();
+        //systemHardReset();
 
-        return;
+        return 0;
     }
     oled.println("card1 init");
 
@@ -222,9 +221,9 @@ void initSD() //Init SD
     {
         oled.println("backup failed");
         delay(5200);
-        systemHardReset();
+        //systemHardReset();
 
-        return;
+        return 0;
     }
     oled.println("backup init");
 
@@ -235,7 +234,7 @@ void initSD() //Init SD
             oled.clear();
             oled.println(F("MkDir 2-1"));
             delay(5200);
-            systemHardReset();
+            //systemHardReset();
         }
     }
     if (!sd2.exists("/Logging"))
@@ -254,7 +253,7 @@ void initSD() //Init SD
             oled.clear();
             oled.println(F("MkDir 1-1"));
             delay(5020);
-            systemHardReset();
+            //systemHardReset();
         }
     }
     if (!SD.exists("/Logging"))
@@ -265,6 +264,7 @@ void initSD() //Init SD
             oled.println(F("MkDir 1-2"));
         }
     }
+    return 1;
 }
 
 //month;date;hour;minute;airTemp;waterTemp;PH;batteryVolts
