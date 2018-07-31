@@ -1,0 +1,227 @@
+EESchema Schematic File Version 4
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:Conn_01x02_Female J1
+U 1 1 5B52236F
+P 3200 3200
+F 0 "J1" H 3094 2875 50  0000 C CNN
+F 1 "BATT_IN" H 3094 2966 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x02_P2.54mm_Vertical" H 3200 3200 50  0001 C CNN
+F 3 "~" H 3200 3200 50  0001 C CNN
+	1    3200 3200
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J3
+U 1 1 5B522420
+P 6000 3100
+F 0 "J3" H 5973 2980 50  0000 R CNN
+F 1 "MCU" H 5973 3071 50  0000 R CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x02_P2.54mm_Vertical" H 6000 3100 50  0001 C CNN
+F 3 "~" H 6000 3100 50  0001 C CNN
+	1    6000 3100
+	-1   0    0    1   
+$EndComp
+$Comp
+L Peters:SI4466 Q1
+U 1 1 5B523C82
+P 5650 3400
+F 0 "Q1" H 5841 3446 50  0000 L CNN
+F 1 "SI4466" H 5841 3355 50  0000 L CNN
+F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 5500 3100 50  0001 C CNN
+F 3 "https://www.vishay.com/docs/71820/71820.pdf" H 5400 3750 50  0001 C CNN
+	1    5650 3400
+	1    0    0    -1  
+$EndComp
+$Comp
+L device:R R1
+U 1 1 5B523D25
+P 5300 3650
+F 0 "R1" H 5370 3696 50  0000 L CNN
+F 1 "4k7" H 5370 3605 50  0000 L CNN
+F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 5230 3650 50  0001 C CNN
+F 3 "~" H 5300 3650 50  0001 C CNN
+	1    5300 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 3450 5300 3450
+Wire Wire Line
+	5300 3450 5300 3500
+Wire Wire Line
+	5750 3600 5750 3850
+Wire Wire Line
+	5750 3850 5300 3850
+Wire Wire Line
+	5300 3850 5300 3800
+$Comp
+L power:VCC #PWR0101
+U 1 1 5B523FAE
+P 4250 3100
+F 0 "#PWR0101" H 4250 2950 50  0001 C CNN
+F 1 "VCC" H 4267 3273 50  0000 C CNN
+F 2 "" H 4250 3100 50  0001 C CNN
+F 3 "" H 4250 3100 50  0001 C CNN
+	1    4250 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR0102
+U 1 1 5B524027
+P 5750 2950
+F 0 "#PWR0102" H 5750 2800 50  0001 C CNN
+F 1 "VCC" H 5767 3123 50  0000 C CNN
+F 2 "" H 5750 2950 50  0001 C CNN
+F 3 "" H 5750 2950 50  0001 C CNN
+	1    5750 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5800 3000 5750 3000
+Wire Wire Line
+	5750 3000 5750 2950
+Wire Wire Line
+	5800 3100 5750 3100
+Wire Wire Line
+	5750 3100 5750 3200
+Wire Wire Line
+	3400 3600 3400 3200
+Connection ~ 5300 3450
+$Comp
+L power:GND #PWR0103
+U 1 1 5B524CC2
+P 3800 3600
+F 0 "#PWR0103" H 3800 3350 50  0001 C CNN
+F 1 "GND" H 3805 3427 50  0000 C CNN
+F 2 "" H 3800 3600 50  0001 C CNN
+F 3 "" H 3800 3600 50  0001 C CNN
+	1    3800 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L opto:PC817 U2
+U 1 1 5B524D48
+P 5000 3100
+F 0 "U2" H 5000 3425 50  0000 C CNN
+F 1 "PC817" H 5000 3334 50  0000 C CNN
+F 2 "Package_DIP:SMDIP-4_W7.62mm" H 4800 2900 50  0001 L CIN
+F 3 "http://www.soselectronic.cz/a_info/resource/d/pc817.pdf" H 5000 3100 50  0001 L CNN
+	1    5000 3100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5300 3200 5300 3450
+$Comp
+L power:VCC #PWR0104
+U 1 1 5B5252DD
+P 5300 2950
+F 0 "#PWR0104" H 5300 2800 50  0001 C CNN
+F 1 "VCC" H 5317 3123 50  0000 C CNN
+F 2 "" H 5300 2950 50  0001 C CNN
+F 3 "" H 5300 2950 50  0001 C CNN
+	1    5300 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5300 2950 5300 3000
+$Comp
+L device:R R2
+U 1 1 5B525429
+P 4700 2650
+F 0 "R2" H 4770 2696 50  0000 L CNN
+F 1 "100R" H 4770 2605 50  0000 L CNN
+F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 4630 2650 50  0001 C CNN
+F 3 "~" H 4700 2650 50  0001 C CNN
+	1    4700 2650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4700 2800 4700 3000
+$Comp
+L power:GND #PWR0105
+U 1 1 5B525642
+P 5300 3850
+F 0 "#PWR0105" H 5300 3600 50  0001 C CNN
+F 1 "GND" H 5305 3677 50  0000 C CNN
+F 2 "" H 5300 3850 50  0001 C CNN
+F 3 "" H 5300 3850 50  0001 C CNN
+	1    5300 3850
+	1    0    0    -1  
+$EndComp
+Connection ~ 5300 3850
+Text GLabel 5300 3450 0    50   Input ~ 0
+gate
+Text GLabel 4000 2050 2    50   Input ~ 0
+gate
+$Comp
+L power:VCC #PWR0106
+U 1 1 5B525BD1
+P 3750 2050
+F 0 "#PWR0106" H 3750 1900 50  0001 C CNN
+F 1 "VCC" H 3768 2223 50  0000 C CNN
+F 2 "" H 3750 2050 50  0001 C CNN
+F 3 "" H 3750 2050 50  0001 C CNN
+	1    3750 2050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4000 2050 3850 2050
+$Comp
+L Connector:Conn_01x03_Male J2
+U 1 1 5B5262AD
+P 3850 2400
+F 0 "J2" V 4003 2212 50  0000 R CNN
+F 1 "Interface" V 3912 2212 50  0000 R CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical" H 3850 2400 50  0001 C CNN
+F 3 "~" H 3850 2400 50  0001 C CNN
+	1    3850 2400
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	3950 2200 4700 2200
+Wire Wire Line
+	4700 2200 4700 2500
+Wire Wire Line
+	3850 2050 3850 2200
+Wire Wire Line
+	3750 2050 3750 2200
+$Comp
+L Peters:3-pin-BoostConv U1
+U 1 1 5B526A38
+P 3900 2800
+F 0 "U1" H 4128 2772 60  0000 L CNN
+F 1 "3-pin-BoostConv" H 3700 3050 60  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical" H 4100 2750 60  0001 C CNN
+F 3 "" H 4100 2750 60  0001 C CNN
+	1    3900 2800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3400 3100 3750 3100
+Wire Wire Line
+	3900 3100 3900 3600
+Wire Wire Line
+	3400 3600 3800 3600
+Connection ~ 3800 3600
+Wire Wire Line
+	3800 3600 3900 3600
+Wire Wire Line
+	4050 3100 4250 3100
+Text GLabel 4700 3200 3    50   Input ~ 0
+mcuGND
+Text GLabel 5750 3100 0    50   Input ~ 0
+mcuGND
+$EndSCHEMATC
