@@ -7,10 +7,10 @@ i2c adresses
 
 
 
+*********************
+OM den inte startar så kolla att RTC oscillatorn verklagen fugerar!
 
-// Define the Base address of the RTC  registers (battery backed up CMOS Ram), so we can use them for config of touch screen and other calibration.
-// See http://stm32duino.com/viewtopic.php?f=15&t=132&hilit=rtc&start=40 for a more details about the RTC NVRam
-// 10x 16 bit registers are available on the STM32F103CXXX more on the higher density device.
+************
 
 
 #ifdef debugMSG
@@ -27,37 +27,36 @@ Serial.print("Some debug stuff follows");
 #include "SdFat.h"
 #include <U8x8lib.h>
 #include <TinyGPS++.h>
-#include <Adafruit_ADS1015.h>
-#include <math.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
 
 //#include "FreeStack.h"
-#define ONE_WIRE_BUS PB1
 
 //Objects:
-Adafruit_ADS1115 ads; /* Use this for the 16-bit version */
 File dataFile;
 SdFat SD(1);
 SdFat sd2(2);
 RTClock rt(RTCSEL_LSE);
 TinyGPSPlus gps;
 U8X8_SSD1306_128X32_UNIVISION_HW_I2C oled(/* reset=*/U8X8_PIN_NONE, /* clock=*/PB6, /* data=*/PB7);
-OneWire oneWire(ONE_WIRE_BUS);       // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature.
 
 //time_t tt1;
 //Pins:
 const uint8_t SD2_CS = PB12;   // chip select for sd2
 const uint8_t SD_CS_PIN = PA4; //CS till SD kort
-const int GPSPower = PB1;
-const int PHPower = PA10;
+const int GPSPower = PA8;
 const int loggingTypePin = PA9; //connected to a flipswitch that idecates what kind of logging we want.
-const int BatteryVoltagePin = PA0; //through a voltage divider to measure battery voltage. 
+const int powerOnPin = PB5;
+const int LEDPlus = PA3;
+const int LEDGreen = PA0;
+const int LEDRed = PA2;
+const int LEDBlue = PA1;
+const int BTN = PB9;
+
 //Globals:
+//long int alarmDelay = (60 * 10) - 1; //this number +1 sec is the sleep time
 long int alarmDelay = 10; //this number +1 sec is the sleep time
+
 uint32_t CurrentTime = 0;
-char weekday1[][7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}; // 0,1,2,3,4,5,6
+//char weekday1[][7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}; // 0,1,2,3,4,5,6
 
 //*******************************************************************************************************
 //#define debugMSG 1 //uncomment this to get deMSG to OLED. Spammy and uses more space
@@ -72,6 +71,9 @@ long int gpsLONG;
 boolean bootUpDone = 0;
 int PHaddress = 99;
 
+float vcc = 0.00;
+float Battvolt = 0.00;
+
 //protos:
 //void gpsTest();                           //OLD test rutine
 void startGPS(); //boot GPS up and get fix
@@ -79,7 +81,7 @@ void startGPS(); //boot GPS up and get fix
 static void smartDelay(unsigned long ms);                               //parse GPS while waiting
 void SDBoilerPlate();                                                   //Print the boiler plate to SD card. when starting a new log
 void reInitOled();                                                      //Powerup OLED disp after sleepmode
-void initSD();                                                          //Init SD
+int initSD();                                                           //Init SD
 void sleep();                                                           //Powersave mode
 void EZOStatus();                                                       //asking EZO vcc and reason for last restart.
 void bootUp();                                                          //check that things are booted up and functioning.
@@ -91,9 +93,10 @@ void LoggingtypeAndFileNames();                                         //Here w
 void spotcheckLogging();                                                //Do a check, log it to SD, sound a Buzer and poer off
 void longTimeLogging();                                                 //Logg every n'th minute and go to sleep
 void writeToFile(float airTemp, float waterTemp, float ph, float Volt); //puts the log results in the SD's funtion to contain error checking between the cards?
-float getAirTemp();                                                     //samples and feeds back the air temp
-float getWaterTemp();                                                   //samples the and feeds back the water temp (Thermistor, or Ktype?)
-float getBattVolt();                                                    //Gets the battery voltage (ADS1115?)
+float getTemperatures(int external);                                    //1 for external temp 0 for internal
+void PHCal();                                                           //3 point calibration rutine for EZO PH
+void PHCheckCal();                                                      //Check if we are calibrated
+
 //My files:
 
 #include <PH.h>     //Atlas PH stuff
@@ -106,16 +109,24 @@ void setup()
       adc_disable_all(); //disable all SDC to save some power
       // setGPIOModeToAllPins(GPIO_INPUT_ANALOG);
 
-      Serial3.begin(9600); //UART till GPS
+      Serial1.begin(9600); //UART till GPS PA10
 
       pinMode(LED_BUILTIN, OUTPUT);
       pinMode(GPSPower, OUTPUT);
-      pinMode(PHPower, OUTPUT);
       pinMode(loggingTypePin, INPUT);
-      digitalWrite(GPSPower, LOW);
-      digitalWrite(PHPower, LOW);
+      pinMode(powerOnPin, OUTPUT);
+      pinMode(LEDPlus, OUTPUT);
+      pinMode(LEDRed, OUTPUT_OPEN_DRAIN);
+      pinMode(LEDGreen, OUTPUT_OPEN_DRAIN);
+      pinMode(LEDBlue, OUTPUT_OPEN_DRAIN);
+      pinMode(BTN, INPUT_PULLDOWN);
 
-      // digitalWrite(LED_BUILTIN, LOW);
+      digitalWrite(powerOnPin, HIGH); //denna slår på hela balletten, sätt låg on du vill sänga av loggern. slås förs på med en brytare.
+      digitalWrite(GPSPower, HIGH);
+      digitalWrite(LED_BUILTIN, LOW);
+      digitalWrite(LEDPlus, HIGH);
+      digitalWrite(LEDGreen, LOW);
+
       Wire.begin();
       Wire.setClock(400000L);
 
@@ -125,29 +136,53 @@ void setup()
       oled.setFont(u8x8_font_amstrad_cpc_extended_f);
       oled.setFlipMode(1);
       oled.drawUTF8(0, 0, "Starting");
-      // oled.println("Starting");
-      ads.begin();
-      ads.setGain(GAIN_TWOTHIRDS);
-      sensors.begin();
-      adc_disable_all();
-      //setGPIOModeToAllPins(GPIO_INPUT_ANALOG);
-      //gpsTest();
+
+      digitalWrite(LEDPlus, LOW);
+      digitalWrite(LEDGreen, HIGH);
+      digitalWrite(LED_BUILTIN, HIGH);
+      // PHCheckCal();
 
       //oled.setInverseFont(0);
 
       //   nvic_sys_reset(); //reset mcu
-
+      //  PHCal(); //uncomment to run the PH calibration sequence.
       bootUp();
 
       if (bootUpDone == 1)
             SDBoilerPlate();
       delay(200);
 
-      digitalWrite(GPSPower, LOW); //this should be the last ting we do in setup
+      digitalWrite(GPSPower, LOW);     //this should be the last ting we do in setup
+      digitalWrite(LED_BUILTIN, HIGH); //HIGH = LED off.
 }
 void bootUp()
 {
-      initSD();
+      PHSleep(); //sleeping, to save power while we'ew booting up
+      int SDOK = 0;
+      while (SDOK == 0)
+      {
+            SDOK = initSD();
+      }
+      if (digitalRead(loggingTypePin))
+      {
+
+            digitalWrite(GPSPower, HIGH);
+            uint timeout = millis();
+            oled.clear();
+            while (millis() - timeout < 30000)
+            {
+                  oled.setCursor(0, 0);
+                  oled.print("PH: ");
+                  oled.println(sortPH());
+                  oled.print("VannTemp: ");
+                  oled.println(getTemperatures(1));
+                  oled.print("LuftTemp: ");
+                  oled.println(getTemperatures(0));
+                  smartDelay(1200);
+            }
+      }
+
+      digitalWrite(LED_BUILTIN, HIGH);
       startGPS();
       syncGPS();
       LoggingtypeAndFileNames();
@@ -192,6 +227,7 @@ void longTimeLogging()
             //float waterTemp = getWaterTemp();
             //float Volt=getBattVolt();
             // writeToFile( airTemp, waterTemp, float ph, Volt);
+            writeToFile(getTemperatures(0), getTemperatures(1), sortPH(), 4.15);
 
             sleep();
       }
@@ -199,21 +235,32 @@ void longTimeLogging()
 
 void spotcheckLogging()
 {
-      //  writeToFile(float airTemp, float waterTemp, sortPH(10), float Volt);
-      writeToFile(dallasTemp(), Thermistor(), sortPH(), 4.15);
+      //month;date;hour;minute;airTemp;waterTemp;PH;batteryVolts
+      writeToFile(getTemperatures(0), getTemperatures(1), sortPH(), 4.15);
       //Buzzer
       //Shutdown --HOW??
       oled.clear();
-      oled.print("DONE!");
-      while(1){
+      oled.println(millis());
+      oled.println("Done!");
+
+      for (size_t i = 0; i < 4; i++)
+      {
+            digitalWrite(LEDGreen, LOW);
+            delay(250);
+            digitalWrite(LEDGreen, HIGH);
+      }
+
+      digitalWrite(powerOnPin, LOW); //stänger av loggern.
+      while (1)
+      {
             /* code */
       }
-      
 }
 
 void LoggingtypeAndFileNames()
 {
-      loggingType = digitalRead(loggingTypePin);
+      //      loggingType = digitalRead(loggingTypePin);
+      loggingType = 1;
 
       if (loggingType == 1) //Sportchecks are chosen
       {
@@ -323,12 +370,12 @@ void sleep()
 
       //Woken up from sleep
       rcc_clk_init(RCC_CLKSRC_HSI, RCC_PLLSRC_HSE, RCC_PLLMUL_9); // 72MHz  => 48 mA  -- datasheet value  => between 40 and 41mA
+      digitalWrite(GPSPower, LOW);                                //this should be the last ting we do in setup
 
       reInitOled(); //starting OLED again
       digitalWrite(LED_BUILTIN, LOW);
-#ifdef debugMSG
 
-      /* code */
+#ifdef debugMSG
       oled.print("Awake");
 #endif
       //Wake up PH

@@ -17,7 +17,7 @@ float phMeasure() //polls the atlas sensor for PH and takes avrages. Retuns ph (
     int PH_wait_time = 1800;
 
     //tempComp(tmpvatten); //temperatur korregering till ph mätaren.
-    int buf[20]; //buffer for read analog
+    //int buf[20]; //buffer for read analog
 
     // state = !state;
     Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
@@ -102,8 +102,7 @@ float phMeasure() //polls the atlas sensor for PH and takes avrages. Retuns ph (
 
 float sortPH() //this function sorts samples and avreges them
 {
-    int samples = 6;
-
+    size_t samples = 6;
 
 #ifdef debugMSG
 
@@ -280,12 +279,195 @@ int PHLED(int on)
     return response;
 }
 
+void PHCal()
+{
+    PHLED(1); //set EZO LED on
+
+    oled.clear();
+    oled.println("PH Calibration");
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    Wire.write("Cal,clear");           //Clear oled Cal data
+    Wire.endTransmission();            //end the I2C data transmission.
+    delay(300);
+
+    oled.clear();
+    oled.println("PH Calibration");
+    oled.println("Cal,mid,7.00");
+    while (digitalRead(BTN))
+    {
+    }
+
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    Wire.write("Cal,mid,7.00");        //Set LED on EZO to "ON"
+    Wire.endTransmission();            //end the I2C data transmission.
+
+    delay(900);
+    Wire.requestFrom(PHaddress, 1); //call the circuit and request 20 bytes (this may be more than we need)
+                                    //byte code = Wire.read();        //the first byte is the response code, we read this separately.
+    char responseChar[8] = {};
+    int j = 0;
+    while (Wire.available())
+    {
+        //are there bytes to receive.
+        in_char = Wire.read();     //receive a byte.
+        responseChar[j] = in_char; //load this byte into our array.
+        j++;                       //incur the counter for the array element.
+        if (in_char == 0)
+        {                           //if we see that we have been sent a null command.
+            j = 0;                  //reset the counter i to 0.
+            Wire.endTransmission(); //end the I2C data transmission.
+            break;                  //exit the while loop.
+        }
+    }
+    int response = atoi(responseChar);
+    oled.println(response);
+    delay(2000);
+
+    oled.clear();
+    oled.println("PH Calibration");
+
+    oled.println("High (10)");
+    while (digitalRead(BTN))
+    {
+    }
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    Wire.write("Cal,high,10.00");      //Set LED on EZO to "ON"
+    Wire.endTransmission();            //end the I2C data transmission.
+
+    delay(900);
+    Wire.requestFrom(PHaddress, 1); //call the circuit and request 20 bytes (this may be more than we need)
+                                    //byte code = Wire.read();        //the first byte is the response code, we read this separately.
+    //responseChar[8] = {};
+    j = 0;
+    while (Wire.available())
+    {
+        //are there bytes to receive.
+        in_char = Wire.read();     //receive a byte.
+        responseChar[j] = in_char; //load this byte into our array.
+        j++;                       //incur the counter for the array element.
+        if (in_char == 0)
+        {                           //if we see that we have been sent a null command.
+            j = 0;                  //reset the counter i to 0.
+            Wire.endTransmission(); //end the I2C data transmission.
+            break;                  //exit the while loop.
+        }
+    }
+    response = atoi(responseChar);
+    oled.println(response);
+    delay(2000);
+
+    oled.clear();
+    oled.println("PH Calibration");
+    oled.println("Cal,low,4.00");
+    while (digitalRead(BTN))
+    {
+    }
+
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    Wire.write("Cal,low,4.00");        //Set LED on EZO to "ON"
+    Wire.endTransmission();            //end the I2C data transmission.
+
+    delay(900);
+    Wire.requestFrom(PHaddress, 1); //call the circuit and request 20 bytes (this may be more than we need)
+                                    //byte code = Wire.read();        //the first byte is the response code, we read this separately.
+    //responseChar[3] = {};
+    j = 0;
+    while (Wire.available())
+    {
+        //are there bytes to receive.
+        in_char = Wire.read();     //receive a byte.
+        responseChar[j] = in_char; //load this byte into our array.
+        j++;                       //incur the counter for the array element.
+        if (in_char == 0)
+        {                           //if we see that we have been sent a null command.
+            j = 0;                  //reset the counter i to 0.
+            Wire.endTransmission(); //end the I2C data transmission.
+            break;                  //exit the while loop.
+        }
+    }
+    response = atoi(responseChar);
+    oled.println(response);
+    delay(2000);
+
+    oled.clear();
+    oled.println("PH Calibration");
+
+    oled.println("Cal,?");
+
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    Wire.write("Cal,?");               //Set LED on EZO to "ON"
+    Wire.endTransmission();            //end the I2C data transmission.
+
+    delay(300);
+    Wire.requestFrom(PHaddress, 1); //call the circuit and request 20 bytes (this may be more than we need)
+                                    //byte code = Wire.read();        //the first byte is the response code, we read this separately.
+    //responseChar[8] = {};
+    j = 0;
+    while (Wire.available())
+    {
+        //are there bytes to receive.
+        in_char = Wire.read();     //receive a byte.
+        responseChar[j] = in_char; //load this byte into our array.
+        j++;                       //incur the counter for the array element.
+        if (in_char == 0)
+        {                           //if we see that we have been sent a null command.
+            j = 0;                  //reset the counter i to 0.
+            Wire.endTransmission(); //end the I2C data transmission.
+            break;                  //exit the while loop.
+        }
+    }
+    // int response = atoi(responseChar);
+    oled.println(responseChar);
+    delay(2000);
+    oled.println("DONE!");
+    PHLED(0); //set EZO LED OFF
+
+    while (1)
+    {
+        //Do noting
+    }
+    return;
+}
+
+void PHCheckCal()
+{
+
+    oled.clear();
+    oled.println("PH Calibration");
+
+    oled.println("Cal,?");
+
+    Wire.beginTransmission(PHaddress); //call the circuit by its ID number.
+    Wire.write("Cal,?");               //Set LED on EZO to "ON"
+    Wire.endTransmission();            //end the I2C data transmission.
+
+    delay(300);
+    Wire.requestFrom(PHaddress, 1); //call the circuit and request 20 bytes (this may be more than we need)
+                                    //byte code = Wire.read();        //the first byte is the response code, we read this separately.
+    char responseChar[8] = {};
+    int j = 0;
+    while (Wire.available())
+    {
+        //are there bytes to receive.
+        in_char = Wire.read();     //receive a byte.
+        responseChar[j] = in_char; //load this byte into our array.
+        j++;                       //incur the counter for the array element.
+        if (in_char == 0)
+        {                           //if we see that we have been sent a null command.
+            j = 0;                  //reset the counter i to 0.
+            Wire.endTransmission(); //end the I2C data transmission.
+            break;                  //exit the while loop.
+        }
+    }
+    String Stringresponse = responseChar;
+    oled.println(Stringresponse);
+    delay(2000);
+    return;
+}
+
 /*from atlas 
 
 
-
-
-//**THIS CODE WILL WORK ON ANY ARDUINO**
 //This code was written to be easy to understand.
 //Modify this code as you see fit.
 //This code will output data to the Arduino serial monitor.
