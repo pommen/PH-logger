@@ -453,9 +453,9 @@ F 3 "http://www.atmel.com/Images/Atmel-8869-SEEPROM-AT24CS32-Datasheet.pdf" H 18
 	1    1800 1700
 	1    0    0    -1  
 $EndComp
-Text GLabel 2200 1750 2    50   Input ~ 10
+Text GLabel 2200 1750 2    50   Input ~ 0
 SCL
-Text GLabel 2200 1600 2    50   Input ~ 10
+Text GLabel 2200 1600 2    50   Input ~ 0
 SDA
 $Comp
 L Board-rescue:C_Small-device-Main-rescue C16
@@ -758,15 +758,15 @@ F 3 "" H 3550 1450 50  0001 C CNN
 	1    3550 1450
 	1    0    0    -1  
 $EndComp
-Text GLabel 2800 2400 0    50   Input ~ 10
+Text GLabel 2950 2250 0    50   Input ~ 0
 MOSI1
-Text GLabel 2800 2500 0    50   Input ~ 10
+Text GLabel 3050 2850 0    50   Input ~ 0
 MISO1
-Text GLabel 2800 2600 0    50   Input ~ 10
+Text GLabel 2950 2150 0    50   Input ~ 0
 SCK1
 Text GLabel 7500 2300 2    50   Input ~ 0
 OLED_SS
-Text GLabel 2850 2250 0    50   Input ~ 10
+Text GLabel 3800 2850 0    50   Input ~ 0
 OLED_SS
 $Sheet
 S 6300 4100 1350 900 
